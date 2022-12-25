@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- link to css -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+    <!-- fav icon -->
+    <link rel="icon" type="image/x-icon" href="image/2.jpeg">
+    <!-- tostifai -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+</head>
+<style>
+    body {
+        background-color: rgb(241, 235, 146);
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+    }
+
+    button {
+        background-color: aquamarine;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        font-size: large;
+    }
+</style>
+
+<body>
+    <!------------------------GUI--------------------------------------------------------->
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="book.html">books</a></li>
+        <li><a href="customers.html">Costumers</a></li>
+        <li><a href="loans.html">Loans</a></li>
+    </ul>
+    customer name <input id="customer_name" style="background-color: rgb(196, 248, 161);">
+    City <input id="City" style="background-color: rgb(196, 248, 161);">
+    Age <input id="Age" style="background-color: rgb(196, 248, 161);"><br><br>
+    customer mode: <input placeholder="on/off" id="customer_mode" style="background-color: rgb(196, 248, 161);"><br><br>
+    <button onclick="addCustomer()" style="color: rgb(0, 0, 0);">Add new customer to libery database</button><br><br>
+    serch active customer by name: <input placeholder="Active customer name.." id="serchActive" onkeyup="loadAtiveCustomer()">
+    serch unactive customer by name: <input placeholder="UnActive customer name.." id="serchUnActive" onkeyup="loadUnAtiveCustomer()"><br><br>
+    <button onclick="loadAtiveCustomer()" style="color: rgb(0, 0, 0);">show all active customer</button>
+    <button onclick="loadUnAtiveCustomer()" style="color: rgb(0, 0, 0);">show all unactive customer</button>
+    
+    <br><br>
+    <div id="display"></div>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script>
+        const MY_SERVER = "https://backend-library-project.onrender.com/customer" //flask
+        // const MY_SERVER ="https://jsonplaceholder.typicode.com/users/" //json place holder
+        // const MY_SERVER = "http://localhost:3000/students/" // fake json server
+        // const MY_SERVER ="http://localhost:5000/students" //my flask python
+
+        ////////////////////////// SHOW THE CUSTOMER DISPLAY ////////////////////////////////////////
+        const loadCustomers = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            CustomerDisplay()
+        }
+
+        loadCustomers()
+        ////////////////////////// CUSTOMER DISPLAY ////////////////////////////////////////
+        
+        const CustomerDisplay = () => {
+            display.innerHTML = res.data.map(cus => `
+            <h6>                           
+            <button onclick='updCustomer(${cus.id})'>update</button>
+            customer name: ${cus.customer_name}&nbsp;&nbsp;&nbsp;&nbsp;
+            City: ${cus.City}&nbsp;&nbsp;&nbsp;&nbsp;
+            Age: ${cus.Age} &nbsp;&nbsp;&nbsp;&nbsp;
+            customer_mode: ${cus.customer_mode} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${cus.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+
+        ////////////////////////// TO SHOW ONLY ACTIVE CUSTOMER ////////////////////////////////////////
+
+        const loadAtiveCustomer = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(cus=> cus.customer_mode == "on").filter(x => x.customer_name.includes(serchActive.value)).map(cus => `
+            <br><h6>                           
+            <button onclick='updCustomer(${cus.id})'>update</button>
+            customer name: ${cus.customer_name}&nbsp;&nbsp;&nbsp;&nbsp;
+            City: ${cus.City}&nbsp;&nbsp;&nbsp;&nbsp;
+            Age: ${cus.Age} &nbsp;&nbsp;&nbsp;&nbsp;
+            customer_mode: ${cus.customer_mode} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${cus.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+        ////////////////////////// TO SHOW ONLY UNACTIVE CUSTOMER ////////////////////////////////////////
+
+        const loadUnAtiveCustomer = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(cus => cus.customer_mode == "off").filter(x => x.customer_name.includes(serchUnActive.value)).map(cus => `
+            <br><h6>                           
+                <button onclick='updCustomer(${cus.id})'>update</button>
+                customer name: ${cus.customer_name}&nbsp;&nbsp;&nbsp;&nbsp;
+                City: ${cus.City}&nbsp;&nbsp;&nbsp;&nbsp;
+                Age: ${cus.Age} &nbsp;&nbsp;&nbsp;&nbsp;
+                customer_mode: ${cus.customer_mode} &nbsp;&nbsp;&nbsp;&nbsp;
+                id:${cus.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+
+        ////////////////////////// TO ADD CUSTOMER ////////////////////////////////////////
+
+        // post (Create)
+        const addCustomer = async () => {
+            await axios.post(MY_SERVER, { customer_name: customer_name.value, City: City.value, Age: Age.value, customer_mode: customer_mode.value }).then((res) => console.log(res.data))
+            loadCustomers()
+        }
+
+        //delete (delete)
+        //const delCustomer = async (id) => {
+        // console.log(id)
+        // await axios.delete(MY_SERVER + "/" + id).then((res) => display.innerHTML = `<h1>Customer id number ${id} deleted</h1>`)
+        //loadCustomers()
+        //  }
+
+        ////////////////////////// TO UPDATE CUSTOMER DETAILS ////////////////////////////////////////
+
+        const updCustomer = async (id) => {
+            // put (update)
+            const res = await axios.put(MY_SERVER + "/" + id, { customer_name: customer_name.value, City: City.value, Age: Age.value, customer_mode: customer_mode.value })
+            console.log(res)
+            loadCustomers()
+        }
+
+        ////////////////////////// Toastify ////////////////////////////////////////
+        Toastify({
+            text: "Customers Section",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+          }).showToast();
+
+    </script>
+</body>
+
+</html>

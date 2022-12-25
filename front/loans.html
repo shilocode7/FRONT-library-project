@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/front/styles.css" />
+    <title>Document</title>
+    <!-- link to css -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+    <!-- fav icon -->
+    <link rel="icon" type="image/x-icon" href="image/2.jpeg">
+    <!-- tostifai -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+</head>
+<style>
+    body {
+        background-color: rgb(241, 235, 146);
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+    }
+
+    button {
+        background-color: aquamarine;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        font-size: large;
+    }
+</style>
+
+
+<body>
+
+    <!----------------------------------GUI------------------------->
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="book.html">books</a></li>
+        <li><a href="customers.html">Costumers</a></li>
+        <li><a href="loans.html">Loans</a></li>
+    </ul>
+    customer id <input id="customer_id" style="background-color: rgb(196, 248, 161);">
+    book id <input id="book_id" style="background-color: rgb(196, 248, 161);"><br><br>
+    Loan date <input type="date" id="Loan_date" style="background-color: rgb(196, 248, 161);">
+    Return date <input type="date" id="Return_date" style="background-color: rgb(196, 248, 161);"><br><br>
+    loan mode <input id="loan_moed" style="background-color: rgb(196, 248, 161);" placeholder="on/off"> <br><br>
+    <button onclick="addLoan()" style="color: rgb(0, 0, 0);">Add new book loan</button><br><br>
+    <button onclick="loadAtiveLoans()" style="color: rgb(0, 0, 0);">show all active loan</button>
+    <button onclick="loadUNAtiveLoans()" style="color: rgb(0, 0, 0);">show all close loan</button>
+    <button onclick="loadLateActiveLoans()" style="color: rgb(0, 0, 0);">show all late loan</button>
+
+    <div id="display"></div>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script>loan_moed
+        const MY_SERVER = "https://backend-library-project.onrender.com/loans" //flask
+        // const MY_SERVER ="https://jsonplaceholder.typicode.com/users/" //json place holder
+        // const MY_SERVER = "http://localhost:3000/students/" // fake json server
+        // const MY_SERVER ="http://localhost:5000/students" //my flask python
+
+        ////////////////////////// ACTIVE LOANS DISPLAY ////////////////////////////////////////
+
+        const loadAtiveLoans = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(loan => loan.loan_moed == "on").map(loan => `
+            <br><h6>     
+            <button onclick='updLoan(${loan.id})'>close loan</button>                  
+            customer_id: ${loan.customer_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            book_id: ${loan.book_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            Loan_date: ${loan.Loan_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            Return_date: ${loan.Return_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            loan_mode: ${loan.loan_moed} &nbsp;&nbsp;&nbsp;&nbsp;
+            book_type: ${loan.book_type} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${loan.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+
+        ////////////////////////// UNACTIVE LOANS DISPLAY ////////////////////////////////////////
+        
+        const loadUNAtiveLoans = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(loan => loan.loan_moed == "off").map(loan => `
+            <br><h6>                       
+            customer_id: ${loan.customer_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            book_id: ${loan.book_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            Loan_date: ${loan.Loan_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            Return_date: ${loan.Return_date} &nbsp;&nbsp;&nbsp;&nbsp;loan_moed
+            loan_mode: ${loan.loan_moed} &nbsp;&nbsp;&nbsp;&nbsp;
+            book_type: ${loan.book_type} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${loan.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+
+        ////////////////////////// LATE LOANS DISPLAY  ////////////////////////////////////////
+
+        const loadLateActiveLoans = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(loan => loan.Return_date < currentDate)
+            .filter(loan => loan.loan_moed == "on").map(loan => `
+            <br><h6>     
+            <button onclick='updLoan(${loan.id})'>close loan</button>                  
+            customer_id: ${loan.customer_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            book_id: ${loan.book_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            Loan_date: ${loan.Loan_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            Return_date: ${loan.Return_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            loan_mode: ${loan.loan_moed} &nbsp;&nbsp;&nbsp;&nbsp;
+            book_type: ${loan.book_type} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${loan.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+        
+        ////////////////////////// ADD LOANS ////////////////////////////////////////
+
+        // post (Create)
+        const addLoan = async () => {
+            await axios.post(MY_SERVER, {
+                customer_id: customer_id.value,
+                book_id: book_id.value,
+                Loan_date: Loan_date.value,
+                Return_date: Return_date.value,
+                loan_moed: loan_moed.value
+            }).then((res) => console.log(res.data))
+            loadAtiveLoans()
+        }
+
+        //////////////////////////  TO UNACTIVE LOANS ////////////////////////////////////////
+
+        //put(update)
+        const updLoan = async (id) => {
+            const res = await axios.put(MY_SERVER + "/" + id, {
+                loan_moed: loan_moed.value
+            })
+            console.log(res)
+        }
+        const LALOANS = async () => {
+            // get (READ)
+            res = await axios.get(MY_SERVER) //get data from server
+            display.innerHTML = res.data.filter(loan => loan.loan_moed == "on").map(loan => `
+            <br><h6>     
+            <button onclick='updLoan(${loan.id})'>close loan</button>                  
+            customer_id: ${loan.customer_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            book_id: ${loan.book_id}&nbsp;&nbsp;&nbsp;&nbsp;
+            Loan_date: ${loan.Loan_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            Return_date: ${loan.Return_date} &nbsp;&nbsp;&nbsp;&nbsp;
+            loan_mode: ${loan.loan_moed} &nbsp;&nbsp;&nbsp;&nbsp;
+            book_type: ${loan.book_type} &nbsp;&nbsp;&nbsp;&nbsp;
+            id:${loan.id}</h6><hr>`).join("") //build display
+            console.log(res.data) //display date  in console
+        }
+
+        ////////////////////////// Toastify ////////////////////////////////////////
+        Toastify({
+            text: "Loans Section",
+            className: "info",
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            }
+          }).showToast();
+
+        ////////////////////////// DEFINE CURRENT DATE ////////////////////////////////////////
+        const date = new Date();
+
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+
+        // This arrangement can be altered based on how we want the date's format to appear.
+        let currentDate = `${year}-${month}-${day}`;
+        console.log(currentDate); // "17-6-2022"
+    </script>
+</body>
+
+</html>
